@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Платеж успешен</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Платеж успешно завершён!</h1>
+    </header>
+
+    <main>
+        <p>Спасибо за вашу поддержку.</p>
+        <p>Номер заказа: {{ order.id }}</p>
+        <a href="{{ url_for('index') }}" class="btn">Вернуться на главную</a>
+    </main>
+
+    <footer>
+        <p>2024 &copy; Пример сайта с PayPal</p>
+    </footer>
+</body>
+</html>

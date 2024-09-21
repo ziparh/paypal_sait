@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Обнаружение мусора на фото</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Обнаружение мусора на фото</h1>
+    </header>
+
+    <main>
+        <form action="{{ url_for('upload_image') }}" method="POST" enctype="multipart/form-data" class="form-container">
+            <label for="image">Загрузите изображение:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+            <button type="submit" class="btn">Анализировать</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>2024 &copy; Пример сайта с AI</p>
+    </footer>
+</body>
+</html>
