@@ -6,7 +6,6 @@ import info
 import base64
 from datetime import datetime
 import os
-from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
