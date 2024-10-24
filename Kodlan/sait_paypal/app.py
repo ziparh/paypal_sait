@@ -7,10 +7,7 @@ import base64
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
-from PIL import Image, ImageDraw
-import torch
-import torchvision
-from torchvision import transforms
+
 
 app = Flask(__name__)
 
@@ -54,13 +51,6 @@ def get_paypal_token():
         return r.json()["access_token"]
     else:
         raise Exception(f"Ошибка получения токена PayPal: {r.text}")
-
-# Загрузка модели YOLOv5 один раз при запуске приложения
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
-model.eval()
-
-# Список классов, которые считаются мусором
-TRASH_CLASSES = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat']
 
 # Создание платежа
 @app.route('/create-payment', methods=['POST'])
@@ -142,60 +132,6 @@ def cancel():
 @app.route('/')
 def index():
     return render_template('index.html')
-
-# Маршрут для загрузки и анализа изображения
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_image():
-    if request.method == 'POST':
-        if 'image' not in request.files:
-            return "Нет файла в запросе", 400
-        file = request.files['image']
-        if file.filename == '':
-            return "Файл не выбран", 400
-        if file:
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-
-            # Обработка изображения
-            detections, result_filename = detect_trash_yolov5(filepath)
-
-            # Отображение результата
-            return render_template('result.html', filename=result_filename, detections=detections)
-
-    return render_template('upload.html')
-
-# Функция для обнаружения мусора на изображении с использованием YOLOv5
-def detect_trash_yolov5(image_path):
-    # Запуск модели на изображении
-    results = model(image_path)
-
-    # Получение предсказаний в формате pandas DataFrame
-    detections = results.pandas().xyxy[0]
-
-    # Фильтрация обнаруженных объектов по списку TRASH_CLASSES и порогу уверенности
-    filtered_detections = detections[
-        (detections['name'].isin(TRASH_CLASSES)) &
-        (detections['confidence'] >= 0.5)
-    ]
-
-    # Отрисовка обнаруженных объектов на изображении
-    annotated_image = results.render()[0]  # Получаем изображение с аннотациями
-
-    # Сохранение аннотированного изображения
-    result_filename = f"result_{os.path.basename(image_path)}"
-    result_path = os.path.join(app.config['UPLOAD_FOLDER'], result_filename)
-    Image.fromarray(annotated_image).save(result_path)
-
-    # Конвертация DataFrame в список словарей
-    detections_list = filtered_detections.to_dict(orient='records')
-
-    return detections_list, result_filename
-
-# Маршрут для отображения результата
-@app.route('/static/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

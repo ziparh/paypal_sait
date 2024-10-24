@@ -33,28 +33,13 @@
 
                 <button type="submit" class="btn">Оплатить через PayPal</button>
             </form>
-        </section>
-
-        <!-- Секция обнаружения мусора -->
-        <section class="ai-section">
-            <h2>Обнаружение Мусора на Фото</h2>
-            <p>Загрузите изображение, и искусственный интеллект определит наличие мусора на нем:</p>
-            <form action="{{ url_for('upload_image') }}" method="POST" enctype="multipart/form-data" class="form-container">
-                <label for="image">Загрузите изображение:</label>
-                <input type="file" id="image" name="image" accept="image/*" required>
-                <button type="submit" class="btn">Анализировать</button>
-            </form>
-        </section>
     </main>
     <script>
         // Обработка выбора процента для пожертвований
         document.querySelectorAll('.percentageButton').forEach(button => {
             button.addEventListener('click', function() {
-                // Удаляем активный класс у всех кнопок
                 document.querySelectorAll('.percentageButton').forEach(btn => btn.classList.remove('active'));
-                // Добавляем активный класс к нажатой кнопке
                 this.classList.add('active');
-                // Устанавливаем значение в скрытое поле
                 document.getElementById('percentage').value = this.getAttribute('data-value');
             });
         });
